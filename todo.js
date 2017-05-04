@@ -115,7 +115,7 @@ class Control{
                         for (let i=0; i<list.length;i++)
                         this._view.tampilDataComplete(i,list[i]);
                       } break;
-
+    case 'filter':   this.filter(this._argv[1]); break;
     case 'add':      this.add(this._argv); break;
     case 'complete': this.listComplete(this._argv[1]); break;
     case 'tag':      this.tag(this._argv); break;
@@ -184,6 +184,20 @@ class Control{
     this._model.write(list)
     this._view.tampilUncomplete()
   }
+
+  filter(input){
+    let list = this._model.list
+    let hasil=[];
+    for(let i=0; i<list.length;i++){
+
+      for(let j=0; j<list[i].tag.length;j++){
+        if(list[i].tag[j]===input)
+          hasil.push(list[i])
+      }
+    }
+    for(let i=0;i<hasil.length;i++)
+      this._view.tampilFilterTag(i+1,hasil[i].task,hasil[i].tag);
+  }
 }
 
 class View{
@@ -237,6 +251,11 @@ class View{
   tampilTag(input){
     console.log(`Data ${input} berhasil ditambahkan`);
   }
+
+  tampilFilterTag(i,task,tags){
+    console.log(`${i}. Task: ${task} || Tag(s):${tags}`)
+  }
+
   tampilError(){
     console.log('Error!')
   }
