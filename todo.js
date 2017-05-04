@@ -40,26 +40,56 @@ class Controller {
     console.log(`${commandVal.toUpperCase()} baru saja ditambahkan ke list...`)
   }
 
+  idTask(){
+    return this._model.command[0]['task']
+  }
+
   deleteTask(){
+    let idTask = this.idTask()
+    this._model.listTask.splice(idTask-1, 1)
+    jsonfile.writeFileSync(this._model.filename, this._model.listTask)
+    // if(this._model.listTask.length == 0){
+    //   console.log('Belum ada list apapun.');
+    // } else {
+    //   console.log('ID Task yang kamu masukan salah');
+    // }
+  }
+
+  completeTask(){
     let idTask = this._model.command[0]['task']
     if(idTask.length!==0 && idTask <= this._model.listTask.length){
-      for(let i=0; i<this._model.listTask; i++){
+      for(let i=1; i<=this._model.listTask.length; i++){
         if(idTask==i){
-          let thisTask = this._model.listTask[i]
-          console.log(`${thisTask} telah berhasil dihapus...`);
-          let newlist = this._model.listTask.splice(i, 1)
-          this._model.listTask = newlist
+          let thisTask = this._model.listTask[i-1]
+          console.log(`${thisTask['task']} telah selesai dikerjakan...`);
+          thisTask['completed'] = true
           jsonfile.writeFileSync(this._model.filename, this._model.listTask)
         }
       }
+    } else if(this._model.listTask.length == 0){
+      console.log('Belum ada list apapun.');
     } else {
       console.log('ID Task yang kamu masukan salah');
     }
   }
 
-  completeTask(){}
-
-  uncompleteTask(){}
+  uncompleteTask(){
+    let idTask = this._model.command[0]['task']
+    if(idTask.length!==0 && idTask <= this._model.listTask.length){
+      for(let i=1; i<=this._model.listTask.length; i++){
+        if(idTask==i){
+          let thisTask = this._model.listTask[i-1]
+          console.log(`${thisTask['task']} belum dikerjakan...`);
+          thisTask['completed'] = false
+          jsonfile.writeFileSync(this._model.filename, this._model.listTask)
+        }
+      }
+    } else if(this._model.listTask.length == 0){
+      console.log('Belum ada list apapun.');
+    } else {
+      console.log('ID Task yang kamu masukan salah');
+    }
+  }
 
   execute(){
     switch(this._model.command[0]['commandKey']){
@@ -101,23 +131,30 @@ class View {
     console.log(`ketik: [node todo.js add <task_content] untuk menambahkan todo list kamu`)
     console.log(`ketik: [node todo.js task <task_id>] untuk melihat detail todo kamu`)
     console.log(`ketik: [node todo.js delete <task_id>] untuk menghapus todo kamu`)
-    console.log(`ketik: [node todo.js complete] untuk menandai bahwa todo kamu telah selesai`)
-    console.log(`ketik: [node todo.js uncomlete] untuk menghilangkan tanda selesai pada todo mu`)
+    console.log(`ketik: [node todo.js complete <task_id>] untuk menandai bahwa todo kamu telah selesai`)
+    console.log(`ketik: [node todo.js uncomplete <task_id>] untuk menghilangkan tanda selesai pada todo mu`)
   }
 
   list(){
     console.log('======= Daftar Todo List =======');
     for(let i=0; i<this._model.listTask.length; i++){
       let nameTask = this._model.listTask[i]['task']
-      console.log(` ${i+1} ${nameTask}`)
+      let taskFlag = this._model.listTask[i]['completed']
+      if(taskFlag){
+        console.log(`${i+1}. [v] ${nameTask}`)
+      } else {
+        console.log(`${i+1}. [ ] ${nameTask}`)
+      }
+    }
+    if(this._model.listTask.length == 0){
+      console.log('Belum ada list apapun.');
     }
   }
 
-  task(){}
 }
 
 let argv = process.argv
 let runner = new Controller()
 runner.readCommands(argv)
-console.log(runner._model.listTask);
-console.log(runner._model.command)
+// console.log(runner._model.listTask);
+// console.log(runner._model.command)
