@@ -7,7 +7,7 @@ class Model {
 
   added(option) {
     if(option !== undefined) {
-      let objectAdded = {task: option, completed: ' '}
+      let objectAdded = {task: option, completed: ' ', tag: []}
       this.tasks.push(objectAdded);
       jsonfile.writeFileSync(this.filename, this.tasks);
     }
@@ -33,6 +33,35 @@ class Model {
       jsonfile.writeFileSync(this.filename, this.tasks);
     } else return this.tasks;
   }
+
+  sortedComplete(option) {
+    let arrSorted = [];
+    if(option === "asc") {
+      for(let i = 0; i < this.tasks.length; i++) {
+        if(this.tasks[i].completed == "V") arrSorted.push(this.tasks[i]);
+      }
+    } else {
+      for(let i = this.tasks.length - 1; i >= 0; i--) {
+        if(this.tasks[i].completed == "V") arrSorted.push(this.tasks[i]);
+      }
+    }
+    return arrSorted;
+  }
+
+  addedTag(option, array) {
+    for(let i = 0; i < array.length; i++) {
+      this.tasks[option-1].tag.push(array[i]);
+    }
+    jsonfile.writeFileSync(this.filename, this.tasks);
+  }
+
+  filtered(option) {
+    let arrFiltered = [];
+    for(let i = 0; i < this.tasks.length; i++) {
+      if(this.tasks[i].tag.includes(option)) arrFiltered.push(this.tasks[i]);
+    }
+    return arrFiltered;
+  }
 }
 
 class Controller {
@@ -43,6 +72,10 @@ class Controller {
 
   inputProcessor(option) {
     let value = cli[3];
+    let tagValue = [];
+    for(let i = 4; i < cli.length; i++) {
+      tagValue.push(cli[i]);
+    }
     switch(option) {
       case "help":
         this.view.help();
@@ -65,6 +98,17 @@ class Controller {
       case "uncomplete":
         this.view.uncompleted(value);
         this.model.uncompleted(value);
+        break;
+      case "list:completed":
+        this.view.sortedComplete(value);
+        break;
+      case "tag":
+        this.view.addedTag(value, tagValue);
+        this.model.addedTag(value, tagValue);
+        break;
+      case "filter":
+        this.view.filtered(value);
+        this.model.filtered(value);
         break;
       }
   }
@@ -114,6 +158,26 @@ class View {
       console.log(`"${this.tasks[option-1].task}" has been marked uncomplete from your TODO list...`);
     } else console.log("Specify your uncompleted task! (complete 'task ID')")
   }
+
+  sortedComplete(option) {
+    let arrCompleted = this.model.sortedComplete(option);
+    for(let i = 0; i < arrCompleted.length; i++) {
+      console.log(`${i+1}. [${arrCompleted[i].completed}] ${arrCompleted[i].task}`)
+    }
+  }
+
+  addedTag(option, array) {
+    if(option !== undefined) {
+      console.log(`(${array}) tag has been added to "${this.tasks[option-1].task}"`);
+    } else console.log("Specify your tagged task! (tag 'task ID' 'tag name')")
+  }
+
+  filtered(option) {
+    let arrFiltered = this.model.filtered(option);
+    for(let i = 0; i < arrFiltered.length; i++) {
+      console.log(`${i+1}. [${arrFiltered[i].completed}] ${arrFiltered[i].task}`)
+    }
+  }
 }
 
 var jsonfile = require('jsonfile')
@@ -123,4 +187,8 @@ let ctrl = new Controller();
 
 ctrl.inputProcessor(cli[2])
 
-// console.log(cli)
+// console.log(cli[3])
+
+// let arr = ['a', 'b']
+//
+// console.log(arr.includes('b'))
