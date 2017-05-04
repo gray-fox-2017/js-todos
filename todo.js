@@ -20,7 +20,7 @@ switch (argv[2]) {
     delete_task(argv[3])
     break;
 
-  case "detail":
+  case "task":
     detail_task(argv[3]);
     break;
 
@@ -41,8 +41,8 @@ function help() {
   console.log("Masukkan (add task_content) untuk menambah task");
   console.log("Masukkan (task task_id) untuk melihat detail task");
   console.log("Masukkan (delete task_id) untuk menghapus task");
-  console.log("Masukkan (complete task_id) untuk menandai task completed");
-  console.log("Masukkan (uncomplete task_id) untuk menhapus tanda task completed");
+  console.log("Masukkan (completed task_id) untuk menandai task completed");
+  console.log("Masukkan (uncompleted task_id) untuk menhapus tanda task completed");
 }
 
 function list() {
@@ -59,7 +59,8 @@ function list() {
 }
 
 function add(task_name) {
-  let tmp = {}
+  let tmp = {};
+  let tmp_str = "";
   // tmp["id"] = data[data.length - 1].id + 1;
   tmp["id"] = Math.ceil(Math.random()*1000);
   for (let h = 1 ; h < data.length; h++){
@@ -69,21 +70,26 @@ function add(task_name) {
   }
   tmp["task"] = task_name;
   tmp["completed"] = false;
+  tmp_str = tmp["task"];
   data.push(tmp);
   fs.writeFile('data.json', JSON.stringify(data) , (err) => {
   if (err) throw err;
+  console.log(`${tmp_str} has been added to task list`);
   console.log('The file has been saved!');
   });
 }
 
 function delete_task(task_id) {
+  let tmp_str = ""
   for (let k = 1; k < data.length + 1; k++){
     if (data[k - 1].id == task_id){
+      tmp_str = data[k - 1].task
       data.splice(k - 1, 1);
     }
   }
   fs.writeFile('data.json', JSON.stringify(data) , (err) => {
   if (err) throw err;
+  console.log(`${tmp_str} has been deleted from task list`);
   console.log('The file has been saved!');
   });
 }
