@@ -91,34 +91,22 @@ class Controller {
     }
   }
 
-  listOutstanding(){
-    if(this._model.command[0].task == 'asc'){
-      this._model.listTask.sort(function (a, b){
-        return new Date(a.checkedDate) - new Date(b.checkedDate)
-      })
-      console.log('Disortir berdasarkan task yang dicheck terbaru');
-    } else if (this._model.command[0].task == 'desc') {
-      this._model.listTask.sort(function (a, b){
-        return new Date(b.checkedDate) - new Date(a.checkedDate)
-      })
-      console.log('Disortir berdasarkan task yang dicheck terbaru');
-    } else {
-      console.log('harap masukan input yang benar');
-    }
+  listOutstandingAsc(){
+    this._model.listTask.sort(function (a, b){
+      return new Date(a.checkedDate) - new Date(b.checkedDate)
+    })
+    // console.log(this._model.listTask);
+    this.saveData()
+    console.log('Disortir berdasarkan task yang dicheck terbaru');
+  }
 
-    console.log('\n======= Daftar Todo List =======');
-    for(let i=0; i<this._model.listTask.length; i++){
-      let nameTask = this._model.listTask[i]['task']
-      let taskFlag = this._model.listTask[i]['completed']
-      if(taskFlag){
-        console.log(`${i+1}. [v] ${nameTask}`)
-      } else {
-        console.log(`${i+1}. [ ] ${nameTask}`)
-      }
-    }
-    if(this._model.listTask.length == 0){
-      console.log('Belum ada list apapun.');
-    }
+  listOutstandingDesc(){
+    this._model.listTask.sort(function (a, b){
+      return new Date(b.checkedDate) - new Date(a.checkedDate)
+    })
+    // console.log(this._model.listTask);
+    this.saveData()
+    console.log('Disortir berdasarkan task yang dicheck terlama');
   }
 
   execute(){
@@ -145,7 +133,15 @@ class Controller {
         this.uncompleteTask()
         break;
       case 'list:outstanding':
-        this.listOutstanding()
+        if(this._model.command[0].task == 'asc'){
+          this.listOutstandingAsc()
+          this._view.list()
+        } else if (this._model.command[0].task == 'desc') {
+          this.listOutstandingDesc()
+          this._view.list()
+        } else {
+          console.log('harap masukan input yang benar');
+        }
         break;
       case 'list:completed':
         this.listCompleted()
