@@ -27,6 +27,7 @@ class Task {
     this.task = taskDetail;
     this.complete = completeValue;
     this.dateCompleted = dateCompleted;
+    this.tag = [];
   }
 }
 
@@ -48,6 +49,14 @@ class Controller {
       case "add":
         this.addTaskList(new Task(model.parameter))
         view.confirmAddTask(model.parameter)
+        break;
+      case "tag":
+        let paramArr = model.parameter.split(" ");
+        let objId = paramArr[0];
+        let taskName = model.taskList[objId].task
+        let tagsArr = paramArr.slice(1);
+        this.tag(objId, tagsArr);
+        view.confirmAddedTag(taskName, tagsArr)
         break;
       case "delete":
         this.deleteData(model.parameter)
@@ -98,7 +107,12 @@ class Controller {
   }
 
   deleteData (paramObjNum) {
-    model.taskList.splice(paramObjNum - 1, 1);
+    model.taskList.splice(paramObjNum, 1);
+    model.saveData()
+  }
+
+  tag (paramObjNum, tagArr) {
+    model.taskList[paramObjNum].tag = tagArr
     model.saveData()
   }
 
@@ -191,6 +205,10 @@ class View {
 
   confirmUncompleteTask(taskName) {
     console.log(`Task ${taskName} mark as uncomplete`);
+  }
+
+  confirmAddedTag(taskName, tagsArr) {
+    console.log(`Tagged Task ${taskName} with tags: ${tagsArr.join(",")}`);
   }
 
 
