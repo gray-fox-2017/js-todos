@@ -8,6 +8,8 @@ class Model {
   added(option) {
     if(option !== undefined) {
       let objectAdded = {task: option, completed: ' ', tag: []}
+      let tanggal = new Date();
+      objectAdded.dateAdded = tanggal.getTime();
       this.tasks.push(objectAdded);
       jsonfile.writeFileSync(this.filename, this.tasks);
     }
@@ -23,6 +25,8 @@ class Model {
   completed(option) {
     if(option !== undefined) {
       this.tasks[option-1].completed = "V"
+      let complete = new Date();
+      this.tasks[option-1].dateCompleted = complete.getTime();
       jsonfile.writeFileSync(this.filename, this.tasks);
     } else return this.tasks;
   }
@@ -46,6 +50,23 @@ class Model {
       }
     }
     return arrSorted;
+  }
+
+  sortedOutstanding(option) {
+    let arrUncomplete = [];
+    for(let i = 0; i < this.tasks.length; i++) {
+      if(this.tasks[i].completed == " ") arrUncomplete.push(this.tasks[i]);
+    }
+    if(option === "asc") {
+      for(let i = 0; i < arrUncomplete.length; i++) {
+        if(arrUncomplete[i].dateAdded < arrUncomplete[i+1].dateAdded) {
+          let swap = arrUncomplete[i+1];
+          arrUncomplete[i+1] = arrUncomplete[i];
+          arrUncomplete[i] = swap;
+        }
+      }
+    }
+    return arrUncomplete;
   }
 
   addedTag(option, array) {
@@ -83,6 +104,9 @@ class Controller {
       case "list":
         this.view.list();
         break;
+      case "task":
+        this.view.task(value);
+        break;
       case "add":
         this.view.added(value);
         this.model.added(value);
@@ -101,6 +125,9 @@ class Controller {
         break;
       case "list:completed":
         this.view.sortedComplete(value);
+        break;
+      case "list:outstanding":
+        this.view.sortedOutstanding(value);
         break;
       case "tag":
         this.view.addedTag(value, tagValue);
@@ -130,8 +157,16 @@ class View {
   }
 
   list() {
+    console.log("Your to do lists:")
     for(let i = 0; i < this.tasks.length; i++) {
       console.log(`${i+1}. [${this.tasks[i].completed}] ${this.tasks[i].task}`)
+    }
+  }
+
+  task(option) {
+    if(option !== undefined) {
+      console.log(`Task number ${option} is:`)
+      console.log(`[${this.tasks[option-1].completed}] ${this.tasks[option-1].task}`)
     }
   }
 
@@ -160,22 +195,32 @@ class View {
   }
 
   sortedComplete(option) {
+    console.log(`Your completed tasks are...`)
     let arrCompleted = this.model.sortedComplete(option);
     for(let i = 0; i < arrCompleted.length; i++) {
       console.log(`${i+1}. [${arrCompleted[i].completed}] ${arrCompleted[i].task}`)
     }
   }
 
+  sortedOutstanding(option) {
+    let arrUncomplete = this.model.sortedOutstanding(option);
+    console.log(`Your incomplete tasks are...`)
+    for(let i = 0; i < arrUncomplete.length; i++) {
+      console.log(`${i+1}. [${arrUncomplete[i].completed}] ${arrUncomplete[i].task}`)
+    }
+  }
+
   addedTag(option, array) {
     if(option !== undefined) {
-      console.log(`(${array}) tag has been added to "${this.tasks[option-1].task}"`);
+      console.log(`"${array}" tag has been added to "${this.tasks[option-1].task}"`);
     } else console.log("Specify your tagged task! (tag 'task ID' 'tag name')")
   }
 
   filtered(option) {
+    console.log(`Your lists based on "${option}" tag(s)`)
     let arrFiltered = this.model.filtered(option);
     for(let i = 0; i < arrFiltered.length; i++) {
-      console.log(`${i+1}. [${arrFiltered[i].completed}] ${arrFiltered[i].task}`)
+      console.log(`${i+1}. [${arrFiltered[i].completed}] ${arrFiltered[i].task} [${arrFiltered[i].tag}]`)
     }
   }
 }
@@ -186,7 +231,8 @@ let cli = process.argv;
 let ctrl = new Controller();
 
 ctrl.inputProcessor(cli[2])
-
+// let tanggal = new Date();
+// console.log(tanggal.getTime())
 // console.log(cli[3])
 
 // let arr = ['a', 'b']
