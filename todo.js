@@ -212,7 +212,7 @@ class View{
       - node todo.js complete <id>
       - node todo.js uncomplete <id>
       - node todo.js list:outstanding asc/dsc
-      - node todo.js list:completed
+      - node todo.js list:completed asc/dsc
       - node todo.js tag <id> <name1> <name2>
       - node todo.js filter <tag_name>`)
   }
