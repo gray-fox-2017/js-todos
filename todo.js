@@ -4,7 +4,7 @@ class Model {
     // taskList adalah array of object
     this.file = './data.json';
     this.command = process.argv[2];
-    this.parameter = process.argv[3];
+    this.parameter = process.argv.slice(3).join(" ");
     this.taskList = this.getData();
   }
 
@@ -18,6 +18,15 @@ class Model {
   saveData () {
     let jsonfile = require('jsonfile')
     jsonfile.writeFileSync(this.file, this.taskList)
+  }
+}
+
+class Task {
+  constructor(taskDetail="no task yet",completeValue=false, dateCompleted="") {
+    this.id = 0;
+    this.task = taskDetail;
+    this.complete = completeValue;
+    this.dateCompleted = dateCompleted;
   }
 }
 
@@ -52,6 +61,28 @@ class Controller {
         this.uncomplete(model.parameter)
         view.confirmUncompleteTask(model.parameter)
         break;
+      case "list:outstanding":
+        if (model.parameter == "asc") {
+          let sortedTaskList = this.ascOutStanding(model.taskList)
+          view.showCompletedTask(sortedTaskList)
+        } else if (model.parameter == "dsc") {
+          let sortedTaskList = this.dscOutStanding(model.taskList)
+          view.showCompletedTask(sortedTaskList)
+        } else {
+          view.showErrorParameter();
+        }
+        break;
+      case "list:completed":
+        if (model.parameter == "asc") {
+          let sortedTaskList = this.ascComplete(model.taskList)
+          view.showCompletedTask(sortedTaskList)
+        } else if (model.parameter == "dsc") {
+          let sortedTaskList = this.dscComplete(model.taskList)
+          view.showCompletedTask(sortedTaskList)
+        } else {
+          view.showErrorParameter();
+        }
+        break;
       case undefined:
         view.showHelp()
         break;
@@ -61,6 +92,7 @@ class Controller {
   }
 
   addTaskList (paramObj) {
+    paramObj.id = model.taskList.length;
     model.taskList.push(paramObj);
     model.saveData()
   }
@@ -71,13 +103,43 @@ class Controller {
   }
 
   complete (paramObjNum) {
-    model.taskList[paramObjNum - 1].complete = true;
+    model.taskList[paramObjNum].complete = true;
+    model.taskList[paramObjNum].dateCompleted = new Date();
     model.saveData()
   }
 
   uncomplete (paramObjNum) {
-    model.taskList[paramObjNum - 1].complete = false;
+    model.taskList[paramObjNum].complete = false;
+    model.taskList[paramObjNum].dateCompleted = ""
     model.saveData()
+  }
+
+  ascOutStanding (paramObj) {
+    paramObj.sort(function(a,b){
+      return new Date(a.dateCompleted) - new Date(b.dateCompleted);
+    });
+    return paramObj
+  }
+
+  dscOutStanding (paramObj) {
+    paramObj.sort(function(a,b){
+      return new Date(b.dateCompleted) - new Date(a.dateCompleted);
+    });
+    return paramObj
+  }
+
+  ascComplete (paramObj) {
+    paramObj.sort(function(a,b){
+      return a.id - b.id;
+    });
+    return paramObj;
+  }
+
+  dscComplete (paramObj) {
+    paramObj.sort(function(a,b){
+      return b.id - a.id;
+    });
+    return paramObj;
   }
 }
 
@@ -97,9 +159,18 @@ class View {
   showTaskList(arrObjTask) {
     for (let i = 0; i < arrObjTask.length; i++) {
       if (arrObjTask[i].complete === true) {
-        console.log(`${i+1}. ${arrObjTask[i].task} [COMPLETED]`);
+        console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task} [COMPLETED]`);
       } else {
-        console.log(`${i+1}. ${arrObjTask[i].task}`);
+        console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task}`);
+      }
+    }
+    return 0;
+  }
+
+  showCompletedTask(arrObjTask) {
+    for (let i = 0; i < arrObjTask.length; i++) {
+      if (arrObjTask[i].complete === true) {
+        console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task} [COMPLETED]`);
       }
     }
     return 0;
@@ -128,31 +199,18 @@ class View {
     return 0;
   }
 
-}
-
-class Task {
-  constructor(taskDetail="no task yet", completeValue=false) {
-    this.task = taskDetail;
-    this.complete = completeValue;
+  showErrorParameter() {
+    console.log("your Parameter is not valid");
+    return 0;
   }
-}
 
-// Display
-// let model = new Model()
-// console.log(model);
-// console.log(model.getData());
-// model.taskList = [{"name":"JP"}, {"name":"adfasd"}, {"name":"ssssss"}];
-// console.log(model.saveData());
-// console.log(model);
+}
 
 let model = new Model();
 let view = new View();
 let control = new Controller();
 
 control.run();
-// console.log(model);
-// console.log(view);
-// console.log(control);
 
 
 
