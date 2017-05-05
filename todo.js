@@ -7,12 +7,24 @@ class Model {
     this.command = []
     this.listTask = jsonfile.readFileSync(this.filename)
   }
+
+  idTask(){
+    return this.command[0]['task']
+  }
+
+  thisTask(){
+    return this.listTask[this.idTask()-1]
+  }
 }
 
 class Controller {
   constructor(){
     this._model = new Model()
     this._view = new View()
+  }
+
+  saveData(){
+    return jsonfile.writeFileSync(this._model.filename, this._model.listTask)
   }
 
   readCommands(command_name){
@@ -33,61 +45,39 @@ class Controller {
   addTask(){
     let objTask = {}
     let commandVal = this._model.command[0]['task']
+
     objTask['task'] = commandVal
     objTask['completed'] = false
+
     this._model.listTask.push(objTask)
-    jsonfile.writeFileSync(this._model.filename, this._model.listTask)
+    this.saveData()
     console.log(`${commandVal.toUpperCase()} baru saja ditambahkan ke list...`)
   }
 
-  idTask(){
-    return this._model.command[0]['task']
-  }
-
   deleteTask(){
-    let idTask = this.idTask()
-    this._model.listTask.splice(idTask-1, 1)
-    jsonfile.writeFileSync(this._model.filename, this._model.listTask)
-    // if(this._model.listTask.length == 0){
-    //   console.log('Belum ada list apapun.');
-    // } else {
-    //   console.log('ID Task yang kamu masukan salah');
-    // }
+    console.log(`${this._model.thisTask()['task']} telah di delete dari list...`)
+    this._model.listTask.splice(this._model.idTask()-1, 1)
+    this.saveData()
+    this._view.checkId
   }
 
   completeTask(){
-    let idTask = this._model.command[0]['task']
-    if(idTask.length!==0 && idTask <= this._model.listTask.length){
-      for(let i=1; i<=this._model.listTask.length; i++){
-        if(idTask==i){
-          let thisTask = this._model.listTask[i-1]
-          console.log(`${thisTask['task']} telah selesai dikerjakan...`);
-          thisTask['completed'] = true
-          jsonfile.writeFileSync(this._model.filename, this._model.listTask)
-        }
-      }
-    } else if(this._model.listTask.length == 0){
-      console.log('Belum ada list apapun.');
+    if(this._model.idTask().length !==0 && this._model.idTask() <= this._model.listTask.length){
+      console.log(`${this._model.thisTask()['task']} belum diselesaikan...`)
+      this._model.thisTask()['completed'] = true
+      this.saveData()
     } else {
-      console.log('ID Task yang kamu masukan salah');
+      this._view.checkId()
     }
   }
 
   uncompleteTask(){
-    let idTask = this._model.command[0]['task']
-    if(idTask.length!==0 && idTask <= this._model.listTask.length){
-      for(let i=1; i<=this._model.listTask.length; i++){
-        if(idTask==i){
-          let thisTask = this._model.listTask[i-1]
-          console.log(`${thisTask['task']} belum dikerjakan...`);
-          thisTask['completed'] = false
-          jsonfile.writeFileSync(this._model.filename, this._model.listTask)
-        }
-      }
-    } else if(this._model.listTask.length == 0){
-      console.log('Belum ada list apapun.');
+    if(this._model.idTask().length !==0 && this._model.idTask() <= this._model.listTask.length){
+      console.log(`${this._model.thisTask()['task']} telah diselesaikan...`)
+      this._model.thisTask()['completed'] = false
+      this.saveData()
     } else {
-      console.log('ID Task yang kamu masukan salah');
+      this._view.checkId()
     }
   }
 
@@ -126,6 +116,7 @@ class View {
   }
 
   help(){
+    console.log(`=====================================How to use=====================================`)
     console.log(`ketik: [node todo.js help] untuk menampilkan cara menggunakan fungsi ini`)
     console.log(`ketik: [node todo.js list] untuk menampilkan list todo kamu`)
     console.log(`ketik: [node todo.js add <task_content] untuk menambahkan todo list kamu`)
@@ -135,8 +126,13 @@ class View {
     console.log(`ketik: [node todo.js uncomplete <task_id>] untuk menghilangkan tanda selesai pada todo mu`)
   }
 
+  reset_board() {
+    console.log('\x1B[2J')
+  }
+
   list(){
-    console.log('======= Daftar Todo List =======');
+    this.reset_board()
+    console.log('\n======= Daftar Todo List =======');
     for(let i=0; i<this._model.listTask.length; i++){
       let nameTask = this._model.listTask[i]['task']
       let taskFlag = this._model.listTask[i]['completed']
@@ -151,10 +147,17 @@ class View {
     }
   }
 
+  checkId(){
+    if(this._model.listTask.length == 0){
+      console.log('Belum ada list apapun.');
+    } else {
+      console.log('ID Task yang kamu masukan salah');
+    }
+  }
 }
 
 let argv = process.argv
 let runner = new Controller()
+runner._view.reset_board()
 runner.readCommands(argv)
-// console.log(runner._model.listTask);
-// console.log(runner._model.command)
+console.log('\n')
