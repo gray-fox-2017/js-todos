@@ -48,6 +48,7 @@ class Controller {
 
     objTask['task'] = commandVal
     objTask['completed'] = false
+    objTask['checkedDate'] = ''
 
     this._model.listTask.push(objTask)
     this.saveData()
@@ -63,8 +64,9 @@ class Controller {
 
   completeTask(){
     if(this._model.idTask().length !==0 && this._model.idTask() <= this._model.listTask.length){
-      console.log(`${this._model.thisTask()['task']} belum diselesaikan...`)
+      console.log(`${this._model.thisTask()['task']} telah diselesaikan dan ditandai...`)
       this._model.thisTask()['completed'] = true
+      this._model.thisTask()['checkedDate'] = new Date().toString()
       this.saveData()
     } else {
       this._view.checkId()
@@ -81,6 +83,44 @@ class Controller {
     }
   }
 
+  task(){
+    if(this._model.idTask().length !==0 && this._model.idTask() <= this._model.listTask.length){
+      console.log(`Task dengan id ${this._model.idTask()} adalah ${this._model.thisTask()['task']}`)
+    } else {
+      this._view.checkId()
+    }
+  }
+
+  listOutstanding(){
+    if(this._model.command[0].task == 'asc'){
+      this._model.listTask.sort(function (a, b){
+        return new Date(a.checkedDate) - new Date(b.checkedDate)
+      })
+      console.log('Disortir berdasarkan task yang dicheck terbaru');
+    } else if (this._model.command[0].task == 'desc') {
+      this._model.listTask.sort(function (a, b){
+        return new Date(b.checkedDate) - new Date(a.checkedDate)
+      })
+      console.log('Disortir berdasarkan task yang dicheck terbaru');
+    } else {
+      console.log('harap masukan input yang benar');
+    }
+
+    console.log('\n======= Daftar Todo List =======');
+    for(let i=0; i<this._model.listTask.length; i++){
+      let nameTask = this._model.listTask[i]['task']
+      let taskFlag = this._model.listTask[i]['completed']
+      if(taskFlag){
+        console.log(`${i+1}. [v] ${nameTask}`)
+      } else {
+        console.log(`${i+1}. [ ] ${nameTask}`)
+      }
+    }
+    if(this._model.listTask.length == 0){
+      console.log('Belum ada list apapun.');
+    }
+  }
+
   execute(){
     switch(this._model.command[0]['commandKey']){
       case 'help':
@@ -93,7 +133,7 @@ class Controller {
         this.addTask()
         break;
       case 'task':
-        this._view.task()
+        this.task()
         break;
       case 'delete':
         this.deleteTask()
@@ -103,6 +143,12 @@ class Controller {
         break;
       case 'uncomplete':
         this.uncompleteTask()
+        break;
+      case 'list:outstanding':
+        this.listOutstanding()
+        break;
+      case 'list:completed':
+        this.listCompleted()
         break;
       default:
         this._view.help()
@@ -124,6 +170,10 @@ class View {
     console.log(`ketik: [node todo.js delete <task_id>] untuk menghapus todo kamu`)
     console.log(`ketik: [node todo.js complete <task_id>] untuk menandai bahwa todo kamu telah selesai`)
     console.log(`ketik: [node todo.js uncomplete <task_id>] untuk menghilangkan tanda selesai pada todo mu`)
+    console.log(`ketik: [node todo.js list:outstanding <asc> atau <desc>] untuk melihat daftar TODO sesuai tanggal ditandai sudah selesai`)
+    console.log(`ketik: [node todo.js list:completed <asc> atau <desc>] untuk melihat daftar TODO sesuai daftar yang sudah selesai`)
+    console.log(`ketik: [node todo.js tag <tag_name_1> atau <tag_name_2>] untuk menambahkan beberapa tag pada TODO`)
+    console.log(`ketik: [node todo.js filter:<tag_name_1>] untuk mencari atau memfilter TODO dengan tag tertentu`)
   }
 
   reset_board() {
@@ -131,7 +181,6 @@ class View {
   }
 
   list(){
-    this.reset_board()
     console.log('\n======= Daftar Todo List =======');
     for(let i=0; i<this._model.listTask.length; i++){
       let nameTask = this._model.listTask[i]['task']
