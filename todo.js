@@ -174,7 +174,11 @@ class View{
       var taskFiltered = this.dataTask.filter(x => x.tags.indexOf(tagFilter) !== -1);
       console.log(`Menampilkan daftar acara berdasarkan tag: ${tagFilter}\n`);
       for (let i=0;i<taskFiltered.length;i++) {
-        console.log(`${i+1}. ${taskFiltered[i].task}        tags: <${taskFiltered[i].tags.join(', ')}>`)
+        var udah = '[X]'
+        if (taskFiltered[i].sudah === false) {
+          var udah = '[ ]'
+        }
+        console.log(`${i+1}. ${udah} ${taskFiltered[i].task}        tags: <${taskFiltered[i].tags.join(', ')}>`)
       }
     }
   }
