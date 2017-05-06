@@ -12,6 +12,10 @@ switch (argv[2]) {
     list()
     break;
 
+  case "list:outstanding":
+    console.log(list_outstanding());
+    break;
+
   case "add":
     add(argv[3])
     break;
@@ -72,7 +76,6 @@ function list() {
 function add(task_name) {
   let tmp = {};
   let tmp_str = "";
-  // tmp["id"] = data[data.length - 1].id + 1;
   tmp["id"] = Math.ceil(Math.random()*1000);
   for (let h = 1 ; h < data.length; h++){
     if (tmp["id"] === data[h-1].id){
@@ -150,9 +153,7 @@ function tag(argv) {
   for (let l = 4; l < argv.length;l++){
     tmp_tag.push(argv[l]);
   }
-
   data[index_id].tag = tmp_tag;
-
   fs.writeFile('data.json', JSON.stringify(data) , (err) => {
   if (err) throw err;
   console.log('The file has been saved!');
@@ -165,3 +166,10 @@ function tag(argv) {
 //
 //   }
 // }
+
+function list_outstanding() {
+  //descending
+  return data.sort(function(a,b){
+    return new Date(b.created_at) - new Date(a.created_at);
+  })
+}
