@@ -50,9 +50,13 @@ class Controller {
         this.tag(this.argv);
         break;
       //
-      // case "filter":
-      //   filter(argv[3]);
-      //   break;
+      case "filter":
+        this.filter(this.argv[3]);
+        break;
+
+      case "list_completed":
+        this.list_completed();
+        break;
 
       default:
       this.view.help()
@@ -185,6 +189,51 @@ class Controller {
         check = "[ ]"
       }
       this.view.list_content(tmp_sort[i].id,tmp_sort[i].task,check, tmp_sort[i].created_at,tmp_sort[i].tag)
+    }
+  }
+
+  filter(tag_filter){
+    let tmp = [];
+    for (let k = 1; k < this.model.data.length + 1; k++){
+      for (let l = 1; l < this.model.data[k - 1].tag.length + 1; l++){
+        if (this.model.data[k - 1].tag[l - 1] == tag_filter){
+          tmp.push(this.model.data[k - 1]);
+        }
+      }
+    }
+
+    this.view.list_header();
+
+    for (let h = 1; h < tmp.length + 1;h++){
+      let check = "";
+      if (tmp[h - 1].completed == true){
+        check = "[X]"
+      } else {
+        check = "[ ]"
+      }
+      this.view.list_content(tmp[h - 1].id,tmp[h - 1].task,tmp[h - 1].completed, check, tmp[h - 1].created_at, tmp[h - 1].tag)
+    }
+  }
+
+  list_completed(){
+    function compare(a,b) {
+      if (a.completed < b.completed){
+        return 1;
+      } else if (a.completed > b.completed){
+        return -1;
+      }
+      return 0;
+    }
+    let tmp_completed = this.model.data.sort(compare);
+    this.view.list_header();
+    for (let i = 0 ; i < tmp_completed.length ; i++){
+      let check = "";
+      if (tmp_completed[i].completed == true){
+        check = "[X]"
+      } else {
+        check = "[ ]"
+      }
+      this.view.list_content(tmp_completed[i].id,tmp_completed[i].task,check, tmp_completed[i].created_at,tmp_completed[i].tag)
     }
   }
 
