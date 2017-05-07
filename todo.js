@@ -142,12 +142,17 @@ class View {
   }
 
   help() {
+    console.log("=====================HELP MENU=====================")
     console.log("Use <list> to view your current list")
     console.log("Use <add> to add a task to your list")
     console.log("Use <task> with a specific task id to view the task")
     console.log("Use <delete> with a specific task id to delete the task")
     console.log("Use <complete> with a specific task id to mark it done")
     console.log("Use <uncomplete> with a specific task id to mark it undone")
+    console.log("Use <list:completed asc|desc(default)> to show your completed tasks")
+    console.log("Use <list:outstanding asc|desc(default)> to show your incomplete tasks based on its creation time")
+    console.log("Use <tag> with a specific task id and tag name to tag your task")
+    console.log("Use <filter> with a specific tag name to filter your task")
   }
 
   list() {
