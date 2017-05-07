@@ -1,0 +1,22 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "data todo",
+  "main": "todo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gray-fox-2017/js-todos.git"
+  },
+  "keywords": [
+    "todo"
+  ],
+  "author": "erwinwahyura",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gray-fox-2017/js-todos/issues"
+  },
+  "homepage": "https://github.com/gray-fox-2017/js-todos#readme"
+}
