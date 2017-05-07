@@ -58,13 +58,7 @@ class Model {
       if(this.tasks[i].completed == " ") arrUncomplete.push(this.tasks[i]);
     }
     if(option === "asc") {
-      for(let i = 0; i < arrUncomplete.length; i++) {
-        if(arrUncomplete[i].dateAdded < arrUncomplete[i+1].dateAdded) {
-          let swap = arrUncomplete[i+1];
-          arrUncomplete[i+1] = arrUncomplete[i];
-          arrUncomplete[i] = swap;
-        }
-      }
+      arrUncomplete.reverse();
     }
     return arrUncomplete;
   }
