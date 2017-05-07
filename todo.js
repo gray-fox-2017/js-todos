@@ -50,6 +50,9 @@ class Controller {
         this.addTaskList(new Task(model.parameter))
         view.confirmAddTask(model.parameter)
         break;
+      case "task":
+        view.showTaskDetail(model.taskList, model.parameter);
+        break;
       case "tag":
         let paramArr = model.parameter.split(" ");
         let objId = paramArr[0];
@@ -92,6 +95,10 @@ class Controller {
           view.showErrorParameter();
         }
         break;
+      case "filter":
+        let filteredTaskObj = this.filterByTag(model.taskList ,model.parameter);
+        view.showTaskByTag(filteredTaskObj, model.parameter)
+        break;
       case undefined:
         view.showHelp()
         break;
@@ -114,6 +121,22 @@ class Controller {
   tag (paramObjNum, tagArr) {
     model.taskList[paramObjNum].tag = tagArr
     model.saveData()
+  }
+
+  filterByTag(paramObj, tag) {
+    let filteredArr = []
+    for (let i = 0; i < paramObj.length; i++) {
+      let tagArr = paramObj[i].tag;
+      if (tagArr == undefined) {
+        continue;
+      } else {
+        if (tagArr.indexOf(tag) != -1) {
+          filteredArr.push(paramObj[i]);
+        }
+      }
+
+    }
+    return filteredArr;
   }
 
   complete (paramObjNum) {
@@ -164,9 +187,14 @@ class View {
     console.log("help > show help");
     console.log("list > show list task");
     console.log("add [task] > show task");
-    console.log("delete [task] > delete task");
-    console.log("complete [task] > check task");
-    console.log("uncomplete [task] > uncheck task");
+    console.log("tag [task number] [new tag] > add tags");
+    console.log("task [task number] > task detail");
+    console.log("delete [task number] > delete task");
+    console.log("check [task number] > check task");
+    console.log("uncheck [task number] > uncheck task");
+    console.log("list:outstanding asc | dsc > sort based on date completed");
+    console.log("list:completed asc | dsc > sort based on task id");
+    console.log("filter [tag name] > sorted by tag");
     return 0;
   }
 
@@ -186,6 +214,21 @@ class View {
       if (arrObjTask[i].complete === true) {
         console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task} [COMPLETED]`);
       }
+    }
+    return 0;
+  }
+
+  showTaskDetail(arrObjTask, taskNum) {
+    console.log(`Detail Task :\n`);
+    console.log("id : ", arrObjTask[taskNum].id);
+    console.log("Completed status : ", arrObjTask[taskNum].complete);
+    console.log("isi Task : ", arrObjTask[taskNum].task);
+  }
+
+  showTaskByTag(arrObjTask, tag) {
+    console.log(`Task with ${tag} tag :`);
+    for (let i = 0; i < arrObjTask.length; i++) {
+      console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task}`);
     }
     return 0;
   }
@@ -229,6 +272,7 @@ let view = new View();
 let control = new Controller();
 
 control.run();
+
 
 
 
