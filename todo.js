@@ -24,6 +24,8 @@ class Controller {
   }
 
   saveData(){
+    // let strJson = JSON.stringify(this._model.listTask)
+    // return jsonfile.writeFileSync(this._model.filename, strJson)
     return jsonfile.writeFileSync(this._model.filename, this._model.listTask)
   }
 
@@ -105,7 +107,7 @@ class Controller {
       return new Date(a.created_date) - new Date(b.created_date)
     })
     this.saveData()
-    this._view.list(this._model.listTask)
+    this._view.unCompletedList(this._model.listTask)
   }
 
   listOutstandingDesc(){
@@ -113,7 +115,7 @@ class Controller {
       return new Date(b.created_date) - new Date(a.created_date)
     })
     this.saveData()
-    this._view.list(this._model.listTask)
+    this._view.unCompletedList(this._model.listTask)
   }
 
   listCompletedAsc(){
@@ -154,14 +156,19 @@ class Controller {
     let keyword = this._model.idTask()
 
     function filterByTag(item) {
-      if (item.tag.indexOf(keyword) !== -1) {
-        return true;
-      }
-      invalidEntries++;
-      return false;
+      // console.log('-----------', item);
+      // if (item.tag != undefined && item.tag.indexOf(keyword) !== -1) {
+      //   return true;
+      // }
+      // invalidEntries++;
+      return item.tag != undefined && item.tag.includes(keyword)
+      // return false;
     }
 
     var arrByTag = this._model.listTask.filter(filterByTag);
+    // var arrByTag = this._model.listTask.filter(function (item){
+    //   filterByTag(item)
+    // } );
 
     console.log(`Filtered by tag: ${keyword}`)
     this._view.list(arrByTag)
@@ -272,6 +279,20 @@ class View {
       let taskFlag = objList[i]['completed']
       if(taskFlag){
         console.log(`${i+1}. [v] ${nameTask}`)
+      }
+    }
+    if(objList.length == 0){
+      console.log('Belum ada list apapun.');
+    }
+  }
+
+  unCompletedList(objList){
+    console.log('\n======= Daftar Todo List =======');
+    for(let i=0; i<objList.length; i++){
+      let nameTask = objList[i]['task']
+      let taskFlag = objList[i]['completed']
+      if(!taskFlag){
+        console.log(`${i+1}. [ ] ${nameTask}`)
       }
     }
     if(objList.length == 0){
