@@ -133,6 +133,14 @@ class Controller{
   }
   
   listoutstanding(order,data){
+    let undone = []
+    for(let i = 0; i < data.length; i++){
+      if(data[i].status === 'uncomplete'){
+        undone.push(data[i])
+        this.view.listoutstanding(undone)
+      }
+    }
+    data = undone
     switch (order) {
       case 'asc': data.sort((a,b) => new Date(b.created_at) < new Date(a.created_at));break
       case 'dsc':data.sort((a,b) => new Date(a.created_at) < new Date(b.created_at));break       
@@ -248,6 +256,16 @@ class View{
     console.log(`${name1} added to ${task}!`)
     }
   }
+  
+  listoutstanding(data){
+    if(data.length > 1){
+    this.clean()
+    console.log(`You have ${data.length} todos that are not completed yet`)
+    }
+    else{
+    console.log(`You have ${data.length} todo that is not completed yet`)  
+    }
+  } 
   
   listcompleted(data){
     if(data.length > 1){
