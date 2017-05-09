@@ -76,10 +76,10 @@ class Controller {
       case "list:outstanding":
         if (model.parameter == "asc") {
           let sortedTaskList = this.ascOutStanding(model.taskList)
-          view.showCompletedTask(sortedTaskList)
+          view.showUncompletedTask(sortedTaskList)
         } else if (model.parameter == "dsc") {
           let sortedTaskList = this.dscOutStanding(model.taskList)
-          view.showCompletedTask(sortedTaskList)
+          view.showUncompletedTask(sortedTaskList)
         } else {
           view.showErrorParameter();
         }
@@ -153,16 +153,16 @@ class Controller {
 
   ascOutStanding (paramObj) {
     paramObj.sort(function(a,b){
-      return new Date(a.dateCompleted) - new Date(b.dateCompleted);
+      return a.id - b.id;
     });
-    return paramObj
+    return paramObj;
   }
 
   dscOutStanding (paramObj) {
     paramObj.sort(function(a,b){
-      return new Date(b.dateCompleted) - new Date(a.dateCompleted);
+      return b.id - a.id;
     });
-    return paramObj
+    return paramObj;
   }
 
   ascComplete (paramObj) {
@@ -213,6 +213,15 @@ class View {
     for (let i = 0; i < arrObjTask.length; i++) {
       if (arrObjTask[i].complete === true) {
         console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task} [COMPLETED]`);
+      }
+    }
+    return 0;
+  }
+
+  showUncompletedTask(arrObjTask) {
+    for (let i = 0; i < arrObjTask.length; i++) {
+      if (arrObjTask[i].complete === false) {
+        console.log(`${arrObjTask[i].id}. ${arrObjTask[i].task}`);
       }
     }
     return 0;
