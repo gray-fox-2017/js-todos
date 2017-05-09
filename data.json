@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "task": "Bikin aplikasi",
+        "complete": false
+    },
+    {
+        "task": "Main node.js",
+        "complete": false
+    },
+    {
+        "task": "makaaaan",
+        "complete": false
+    }
+]
