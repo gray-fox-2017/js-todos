@@ -1,3 +1,4 @@
+
 "use strict"
 
 const fs = require('fs');
@@ -129,13 +130,15 @@ class View {
   }
 
   displayOutstanding(data) {
-    let sorting = data.sort((a, d) => a["created_date"] > d["created_date"]);
+    let filter = data.filter((element) => element["completed"] == false);
+    let sorting = filter.sort((a, d) => a["created_date"] > d["created_date"]);
     console.log("Sorting by ascending:");
     return sorting.forEach((element, index) => console.log(`${index+1}. ${element["task"]}`));
   }
 
   displayOutstandingDesc(data) {
-    let sorting = data.sort((a, d) => a["created_date"] < d["created_date"]);
+    let filter = data.filter((element) => element["completed"] == false);
+    let sorting = filter.sort((a, d) => a["created_date"] < d["created_date"]);
     console.log("Sorting by descending:");
     return sorting.forEach((element, index) => console.log(`${index+1}. ${element["task"]}`));
   }
