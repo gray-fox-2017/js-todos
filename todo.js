@@ -86,21 +86,65 @@ class Model {
     this.writeData(data);
   }
 
-  // sortAsc(data) {
-  //   let data2 = data.sort((a,b)  {
-  //     return new Date(a.created_at) - new Date(b.created_at);
-  //   });
-  //   data2 = this.sortId(data2);
-  //   return data2;
-  // }
+  sortAsc(data) {
+    let data2 = data.sort((a,b) => {
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+    data2 = this.sortId(data2);
+    return data2;
+  }
 
- // sortDsc(data) {
- //    let data2 = data.sort((a,b) {
- //      return new Date(b.created_at) - new Date(a.created_at);
- //    });
- //    data2 = this.sortId(data2);
- //    return data2;
- //  }
+ sortDsc(data) {
+    let data2 = data.sort((a,b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+    data2 = this.sortId(data2);
+    return data2;
+  }
+
+  sortBy(data, sortType) {
+   if (sortType == "asc") {
+     let data2 = this.sortAsc(data);
+     return data2;
+   }
+   else if (sortType == "desc") {
+     let data2 = this.sortDsc(data);
+     return data2;
+   }
+   else {
+     let data2 = this.sortAsc(data);
+     return data2;
+   }
+ }
+
+  listOutstanding(sortType) {
+   let data = this.readData();
+   if (data.length > 0) {
+     let data2 = this.sortBy(data, sortType);
+     for (let i = 0; i < data.length; i++) {
+       console.log(`${data2[i].id}. [${data2[i].completed ? "X" : " "}] ${data2[i].task} Date created: ${data2[i].created_at}`);
+     }
+   }
+   else {
+     console.log("Empty tasks");
+   }
+ }
+
+
+   listCompleted(sortType) {
+    let data = this.readData();
+    if (data.length > 0) {
+      let data2 = this.sortBy(data, sortType);
+      for (let i = 0; i < data.length; i++) {
+        if (data2[i].completed === true) {
+          console.log(`${data2[i].id}. [${data2[i].completed ? "X" : " "}] ${data2[i].task} Date completed: ${data2[i].completed_at}`);
+        }
+      }
+    }
+    else {
+      console.log("Empty tasks");
+    }
+  }
 
 
 }
@@ -160,54 +204,11 @@ class Controller {
   let data = this.model.readData();
   if(data.length > 0){
     for (let i = 0; i < data.length; i++) {
-      if (data[i].id === id) {
+      if (data[i].id == id) {
         console.log(`${data[i].id}. ${data[i].task}`);
       }
     }
   }
- }
-
-  sortBy(data, sortType) {
-   if (sortType == "asc") {
-     let data2 = this.model.sortAsc(data);
-     return data2;
-   }
-   else if (sortType == "desc") {
-     let data2 = this.model.sortDsc(data);
-     return data2;
-   }
-   else {
-     let data2 = this.model.sortAsc(data);
-     return data2;
-   }
- }
-
-  listOutstanding(sortType) {
-   let data = this.model.readData();
-   if (data.length > 0) {
-     let data2 = this.sortBy(data, sortType);
-     for (let i = 0; i < data.length; i++) {
-       console.log(`${data2[i].id}. [${data2[i].completed ? "X" : " "}] ${data2[i].task} Date created: ${data2[i].created_at}`);
-     }
-   }
-   else {
-     console.log("Empty tasks");
-   }
- }
-
-  listCompleted(sortType) {
-   let data = this.model.readData();
-   if (data.length > 0) {
-     let data2 = this.sortBy(data, sortType);
-     for (let i = 0; i < data.length; i++) {
-       if (data2[i].completed === true) {
-         console.log(`${data2[i].id}. [${data2[i].completed ? "X" : " "}] ${data2[i].task} Date completed: ${data2[i].completed_at}`);
-       }
-     }
-   }
-   else {
-     console.log("Empty tasks");
-   }
  }
 
    run(param) {
@@ -219,10 +220,10 @@ class Controller {
         this.view.list(this.model.readData());
         break;
       case "list:outstanding":
-        this.view.listOutstanding(param[1]);
+        this.model.listOutstanding(param[1]);
         break;
       case "list:completed":
-        this.view.listCompleted(param[1]);
+        this.model.listCompleted(param[1]);
         break;
       case "add":
         param.shift();
@@ -250,7 +251,7 @@ class Controller {
         this.filter(param[1]);
         break;
       default:
-        console.log("Please input correct command.");
+        this.view.help();
         break;
     }
   }
